@@ -11,6 +11,7 @@ class HomeScreen extends StatelessWidget {
 
   TextEditingController ageController = TextEditingController();
 
+  String? editingItmId;
   final formkey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -65,18 +66,29 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () async {
                   if (formkey.currentState!.validate()) {
                     try {
-                      await FirebaseFirestore.instance
-                          .collection('details')
-                          .add({
-                        'name': nameController.text,
-                        'age': ageController.text
-                      });
+                      if (editingItmId != null) {
+                        await FirebaseFirestore.instance
+                            .collection('details')
+                            .doc(editingItmId)
+                            .update({
+                          'name': nameController.text,
+                          'age': ageController.text
+                        });
+                        editingItmId = null;
+                      } else {
+                        await FirebaseFirestore.instance
+                            .collection('details')
+                            .add({
+                          'name': nameController.text,
+                          'age': ageController.text
+                        });
+                      }
+                      nameController.clear();
+                      ageController.clear();
                       print('Data added successfully');
                     } catch (e) {
                       print('Error adding data: $e');
                     }
-                    nameController.clear();
-                    ageController.clear();
                   }
                 },
                 child: const Text(
@@ -96,14 +108,82 @@ class HomeScreen extends StatelessWidget {
                 return ListView.separated(
                     itemBuilder: (context, index) {
                       var docs = snapshot.data!.docs[index];
-                      String name = docs['name']??'';
-                      String age = docs['age']??'';
-
+                      String name = docs['name'] ?? '';
+                      String age = docs['age'] ?? '';
+TextEditingController nameController=TextEditingController(text: docs['name']);
+TextEditingController ageController=TextEditingController(text: docs['age']);
                       return ListTile(
                         title: Text(name),
-                        subtitle: Text(age),trailing: IconButton(icon: Icon(Icons.delete),onPressed: ()async {
-                          await FirebaseFirestore.instance.collection('details').doc(docs.id).delete();
-                        },),
+                        subtitle: Text(age),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Edit data'),
+                                          content: Column(children: [
+                                            TextFormField(
+                                              controller: nameController,
+                                              decoration: InputDecoration(
+                                                  labelText: 'Name'),
+                                            ),
+                                            TextFormField(
+                                              controller: ageController,
+                                              decoration: InputDecoration(
+                                                  labelText: 'Age'),
+                                            ),
+                                            // Text('Name :$name'),
+                                            // Text('Age:$age')
+                                          ]),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                                onPressed: () async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('details')
+                                                      .doc(docs.id)
+                                                      .update({
+                                                    'name': nameController.text,
+                                                    'age': ageController.text
+                                                  });
+
+                                                  nameController.clear();
+                                                  ageController.clear();
+
+                                                  Navigator.of(context).pop();
+                                                  print(
+                                                      'data edited sucessfully');
+                                                },
+                                                child: Text('Save'))
+                                          ],
+                                        );
+                                      });
+                                  // editingItmId = docs.id;
+                                  // nameController.text = name;
+                                  // ageController.text = age;
+                                },
+                                icon: Icon(Icons.edit)),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () async {
+                                await FirebaseFirestore.instance
+                                    .collection('details')
+                                    .doc(docs.id)
+                                    .delete();
+                              },
+                            ),
+                          ],
+                        ),
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(),
@@ -117,6 +197,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void addEvent({String? name, String? age}) async {}
+  
 }
 
 
