@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_miniproject_1/screens/common_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -66,23 +67,12 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () async {
                   if (formkey.currentState!.validate()) {
                     try {
-                      if (editingItmId != null) {
-                        await FirebaseFirestore.instance
-                            .collection('details')
-                            .doc(editingItmId)
-                            .update({
-                          'name': nameController.text,
-                          'age': ageController.text
-                        });
-                        editingItmId = null;
-                      } else {
                         await FirebaseFirestore.instance
                             .collection('details')
                             .add({
                           'name': nameController.text,
                           'age': ageController.text
                         });
-                      }
                       nameController.clear();
                       ageController.clear();
                       print('Data added successfully');
@@ -110,9 +100,14 @@ class HomeScreen extends StatelessWidget {
                       var docs = snapshot.data!.docs[index];
                       String name = docs['name'] ?? '';
                       String age = docs['age'] ?? '';
-TextEditingController nameController=TextEditingController(text: docs['name']);
-TextEditingController ageController=TextEditingController(text: docs['age']);
+                      TextEditingController nameController =
+                          TextEditingController(text: docs['name']);
+                      TextEditingController ageController =
+                          TextEditingController(text: docs['age']);
                       return ListTile(
+                        onTap: () {
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Commonscreen(name: name,doc1: docs.id,)));
+                        },
                         title: Text(name),
                         subtitle: Text(age),
                         trailing: Row(
@@ -197,7 +192,6 @@ TextEditingController ageController=TextEditingController(text: docs['age']);
   }
 
   void addEvent({String? name, String? age}) async {}
-  
 }
 
 
