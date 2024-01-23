@@ -120,24 +120,26 @@ class HomeScreen extends StatelessWidget {
                                       builder: (BuildContext context) {
                                         return AlertDialog(
                                           title: Text('Edit data'),
-                                          content: Column(children: [
-                                            TextFormField(
-                                              controller: nameController,
-                                              decoration: InputDecoration(
-                                                  labelText: 'Name'),
-                                            ),
-                                            TextFormField(
-                                              controller: ageController,
-                                              decoration: InputDecoration(
-                                                  labelText: 'Age'),
-                                            ),
-                                            // Text('Name :$name'),
-                                            // Text('Age:$age')
-                                          ]),
+                                          content: SingleChildScrollView(
+                                            child: Column(children: [
+                                              TextFormField(
+                                                controller: nameController,
+                                                decoration: InputDecoration(
+                                                    labelText: 'Name'),
+                                              ),
+                                              TextFormField(
+                                                controller: ageController,
+                                                decoration: InputDecoration(
+                                                    labelText: 'Age'),
+                                              ),
+                                              // Text('Name :$name'),
+                                              // Text('Age:$age')
+                                            ]),
+                                          ),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
-                                                Navigator.of(context).pop();
+                                                Navigator.pop(context);
                                               },
                                               child: const Text('Cancel'),
                                             ),
@@ -155,7 +157,8 @@ class HomeScreen extends StatelessWidget {
                                                   nameController.clear();
                                                   ageController.clear();
 
-                                                  Navigator.of(context).pop();
+                                                  Navigator.pop(context);
+                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('sucessfully updated')));
                                                   print(
                                                       'data edited sucessfully');
                                                 },

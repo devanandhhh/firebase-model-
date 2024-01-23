@@ -1,8 +1,9 @@
 import 'package:firebase_miniproject_1/subscreen.dart/team.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class Commonscreen extends StatelessWidget {
-   Commonscreen({super.key,this.name,this.doc1});
+   Commonscreen({super.key,required this.name,required this.doc1});
 // ignore: prefer_typing_uninitialized_variables
 final name;
 // ignore: prefer_typing_uninitialized_variables
